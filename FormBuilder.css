@@ -1,0 +1,9 @@
+div.form_field_wrap{float: left;margin-right: 10px;margin-bottom: 5px;}
+div.form_field_wrap > label{display: block;}
+div.form_field_wrap > input[type=text]{}
+div.form_field_wrap > select{}
+div.form_field_wrap > div.checkbox_header{}
+div.form_field_wrap > div.checkbox_wrapper{}
+div.form_field_wrap > input[type=checkbox]{}
+div.checkbox_header{}
+.form-newline{display: block;clear: both;height: 1px;}
