@@ -186,16 +186,36 @@ class FormBuilderOutput
     protected function parseFieldset($input)
     {
         $id = !empty($input['id']) ? ' id="' . $input['id'] . '"' : '';
-        return "<fieldset {$id}><legend>{$input['title']}</legend>";
+        $class = $this->parseClasses($input['class']);
+        return "<fieldset {$class} {$id}><legend>{$input['title']}</legend>";
     }
 
     /**
      * @param $input
      * @return string
      */
-    protected function parseClosefieldset($input)
+    protected function parseClosefieldset()
     {
         return '</fieldset>';
+    }
+
+    /**
+     * @param $input
+     * @return string
+     */
+    protected function parseTab($input)
+    {
+        $id = !empty($input['id']) ? ' id="' . $input['id'] . '"' : '';
+        $defaultOpen =  ($input['open']) ? 'style="display:block;"' : '';
+        return "<div class='tabcontent' {$id} {$defaultOpen}>";
+    }
+
+    /**
+     * @return string
+     */
+    protected function parseClosetab()
+    {
+        return '</div><!-- tab -->';
     }
 
     /**
@@ -407,6 +427,35 @@ class FormBuilderOutput
         }
     }
 
+    /**
+     * @return string
+     */
+    protected function renderTabs()
+    {
+        $tabs = array();
+        foreach ($this->formBuilder->getInputs() as $input) {
+            if ($input['type'] === 'tab') {
+                $tabs[] = $input;
+            }
+        }
+
+        if (empty($tabs)) {
+            return '';
+        }
+
+        $html = '<div class="tab">';
+        foreach ($tabs as $tab) {
+            $selectecTab = ($tab['open']) ? 'active' : '';
+            $html .= "<button class='tablinks {$tab['class']} {$selectecTab}' onclick='openFormTab(event, \"{$tab['id']}\");'>{$tab['title']}</button>";
+        }
+
+        return "{$html}</div>";
+
+//  <button class="tablinks" onclick="openCity(event, 'Paris')">Paris</button>
+//  <button class="tablinks" onclick="openCity(event, 'Tokyo')">Tokyo</button>
+//</div>
+    }
+
 	/**
 	 * Build the HTML for the form based on the input queue
 	 *
@@ -417,7 +466,11 @@ class FormBuilderOutput
     public function render($echo = true)
     {
         // default style, to make life easy
-        $output = "<link rel='stylesheet' href='/FormBuilder.css'>";
+        $output  = "<link rel='stylesheet' href='/FormBuilder.css'>";
+        $output .= "<script src='/FormBuilder.js'></script>";
+
+        $output .= $this->renderTabs();
+
         $output .= $this->openFormTag();
         $this->formBuilder->addHoneypot();
 

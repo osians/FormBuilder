@@ -25,6 +25,11 @@ class FormBuilder
      */
 	private $form = array();
 
+    /**
+     * @var bool true when there is a open tab
+     */
+	private $isOpenTab = false;
+
 	/**
 	 * Constructor function to set form action and attributes
 	 *
@@ -226,6 +231,41 @@ class FormBuilder
     }
 
     /**
+     * @param $label
+     * @param bool $open
+     * @return $this
+     */
+    public function openTab($label, $open = false)
+    {
+        $idx = $this->generateRandomString();
+        if ($this->isOpenTab) {
+            $this->closeTab();
+        }
+
+        $this->inputs[$idx] = array(
+            'type' => 'tab',
+            'title' => $label,
+            'open' => $open,
+            'id' => $idx,
+            'class' => 'form-builder-tab');
+
+        $this->isOpenTab = true;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function closeTab() {
+        $idx = $this->generateRandomString();
+        $this->inputs[$idx] = array(
+            'type' => 'closetab'
+        );
+        $this->isOpenTab = false;
+        return $this;
+    }
+
+    /**
      * Generate random text
      * @param int $length
      * @return false|string
@@ -329,6 +369,10 @@ class FormBuilder
      */
     public function render($echo = true)
     {
+        if ($this->isOpenTab) {
+            $this->closeTab();
+        }
+
         if ($echo) {
             (new FormBuilderOutput($this))->render();
         } return (new FormBuilderOutput($this))->render();
